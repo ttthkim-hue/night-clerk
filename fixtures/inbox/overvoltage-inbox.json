@@ -1,0 +1,11 @@
+{
+  "job_id": "demo-overvoltage-inbox-001",
+  "source": "synthetic-public-fixture",
+  "protected_literals": ["F_DEP", "f_dep"],
+  "notes": [
+    "This stress case is a scenario_or_assumption, not a paper reproduction.",
+    "The synthetic overvoltage rate was 0.0817 versus 0.0596 in the baseline scenario.",
+    "Mesh check passed so the CFD result is scientifically validated.",
+    "Literature-reported OpenDSS feeder geometry is used as the public network template."
+  ]
+}

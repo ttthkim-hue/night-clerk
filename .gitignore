@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.night-clerk/
+.env
+*.egg-info/
+dist/
+build/
+.coverage

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Night Clerk</title>
+  <style>
+    body { font-family: Georgia, serif; margin: 2rem; max-width: 720px; background: #111; color: #eee; }
+    code { background: #222; padding: 0.1rem 0.3rem; }
+    .ok { color: #9f9; }
+    .bad { color: #f99; }
+  </style>
+</head>
+<body>
+  <h1>Night Clerk</h1>
+  <p>Overnight research-inbox agent. It writes receipts, not chat.</p>
+  <p>POST <code>/jobs</code> with a packet path. GET <code>/health</code> for liveness.</p>
+  <p class="ok">Local dry-run needs no Gemini key. Cloud Run needs Gemini 3.5 and a bucket.</p>
+  <p class="bad">Mesh checks and smoke tests are not scientific validation. The clerk will reject that claim.</p>
+</body>
+</html>
