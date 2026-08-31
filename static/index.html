@@ -2,19 +2,91 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Night Clerk</title>
   <style>
-    body { font-family: Georgia, serif; margin: 2rem; max-width: 720px; background: #111; color: #eee; }
-    code { background: #222; padding: 0.1rem 0.3rem; }
+    body { font-family: system-ui, sans-serif; margin: 2rem auto; padding: 0 1rem; max-width: 860px; background: #111; color: #eee; }
+    code, pre { background: #1f1f1f; }
+    code { padding: 0.1rem 0.3rem; }
+    pre { padding: 1rem; overflow: auto; white-space: pre-wrap; border: 1px solid #444; border-radius: 8px; }
+    button { font: inherit; padding: 0.65rem 1rem; cursor: pointer; }
     .ok { color: #9f9; }
     .bad { color: #f99; }
+    .muted { color: #bbb; }
+    .row { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .card { border: 1px solid #444; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
   </style>
 </head>
 <body>
   <h1>Night Clerk</h1>
-  <p>Overnight research-inbox agent. It writes receipts, not chat.</p>
-  <p>POST <code>/jobs</code> with a packet path. GET <code>/health</code> for liveness.</p>
-  <p class="ok">Local dry-run needs no Gemini key. Cloud Run needs Gemini 3.5 and a bucket.</p>
-  <p class="bad">Mesh checks and smoke tests are not scientific validation. The clerk will reject that claim.</p>
+  <p>Overnight research-inbox agent. It runs a job, writes an evidence receipt, and leaves the final review to a human. It is not a chatbot.</p>
+
+  <div class="card">
+    <h2>Public live demo</h2>
+    <p class="muted">This synthetic packet contains a valid scenario note, numeric material to classify, and a deliberately false claim that a mesh check scientifically validates a CFD result.</p>
+    <button id="run-demo" type="button">Run public demo packet</button>
+    <span id="status" class="muted"></span>
+  </div>
+
+  <div class="row" id="summary" hidden>
+    <div class="card"><strong>Accepted</strong><div id="accepted">-</div></div>
+    <div class="card"><strong>Held</strong><div id="held">-</div></div>
+    <div class="card"><strong>Rejected</strong><div id="rejected">-</div></div>
+    <div class="card"><strong>Model</strong><div id="model">-</div></div>
+  </div>
+
+  <pre id="receipt" hidden></pre>
+
+  <p class="ok">Expected safety behavior: the deterministic gate rejects a claim that treats a mesh check as scientific validation.</p>
+  <p><a href="/health" class="ok">Health endpoint</a> · API: <code>POST /jobs</code></p>
+
+  <script>
+    const demoButton = document.getElementById("run-demo");
+    const status = document.getElementById("status");
+    const summary = document.getElementById("summary");
+    const receipt = document.getElementById("receipt");
+
+    const publicPacket = () => ({
+      job_id: `demo-live-${Date.now()}`,
+      source: "synthetic-public-fixture",
+      protected_literals: ["F_DEP", "f_dep"],
+      notes: [
+        "This stress case is a scenario_or_assumption, not a paper reproduction.",
+        "The synthetic overvoltage rate was 0.0817 versus 0.0596 in the baseline scenario.",
+        "Mesh check passed so the CFD result is scientifically validated.",
+        "Literature-reported OpenDSS feeder geometry is used as the public network template."
+      ]
+    });
+
+    demoButton.addEventListener("click", async () => {
+      demoButton.disabled = true;
+      status.textContent = " Running…";
+      summary.hidden = true;
+      receipt.hidden = true;
+      try {
+        const response = await fetch("/jobs", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ packet: publicPacket() })
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+        }
+        const data = await response.json();
+        document.getElementById("accepted").textContent = data.accepted;
+        document.getElementById("held").textContent = data.held;
+        document.getElementById("rejected").textContent = data.rejected;
+        document.getElementById("model").textContent = data.model;
+        summary.hidden = false;
+        receipt.textContent = JSON.stringify(data, null, 2);
+        receipt.hidden = false;
+        status.textContent = " Complete";
+      } catch (error) {
+        status.textContent = ` Failed: ${error.message}`;
+      } finally {
+        demoButton.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>
