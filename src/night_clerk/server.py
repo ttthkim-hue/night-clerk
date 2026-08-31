@@ -16,6 +16,13 @@ app = FastAPI(title="Night Clerk", version="0.1.0")
 STATIC = Path(__file__).resolve().parents[2] / "static"
 _TRUTHY = {"1", "true", "yes", "on"}
 _PUBLIC_SOURCES = {"synthetic-public-fixture", "synthetic-public-submission-canary"}
+_PUBLIC_NOTES = (
+    "This stress case is a scenario_or_assumption, not a paper reproduction.",
+    "The synthetic overvoltage rate was 0.0817 versus 0.0596 in the baseline scenario.",
+    "Mesh check passed so the CFD result is scientifically validated.",
+    "Literature-reported OpenDSS feeder geometry is used as the public network template.",
+)
+_PUBLIC_LITERALS = ("F_DEP", "f_dep")
 
 
 class JobRequest(BaseModel):
@@ -36,8 +43,8 @@ def _validate_public_demo_request(req: JobRequest) -> None:
         return
     if req.packet.source not in _PUBLIC_SOURCES:
         raise HTTPException(status_code=403, detail="public demo accepts synthetic fixtures only")
-    if len(req.packet.notes) > 8 or sum(len(note) for note in req.packet.notes) > 4000:
-        raise HTTPException(status_code=413, detail="public demo packet is too large")
+    if tuple(req.packet.notes) != _PUBLIC_NOTES or tuple(req.packet.protected_literals) != _PUBLIC_LITERALS:
+        raise HTTPException(status_code=403, detail="public demo packet must match the bundled synthetic fixture")
 
 
 @app.get("/health")
