@@ -7,20 +7,22 @@ Do not mark a gate PASS from intent or documentation. Require observed evidence.
 ## Gate status
 
 - `LOCAL_GATE` — run `pytest` and one credential-free CLI dry-run from a clean environment.
-- `GOOGLE_TECH_GATE` — live cloud run must return a receipt whose `model` is `gemini-3.5-flash`; deterministic-only `model: not-run` is not sufficient for the contest.
-- `CLOUD_GATE` — deployed `.run.app` URL responds to `/health`; one `/jobs` call writes a Cloud Storage receipt and Firestore record.
-- `DEMO_GATE` — public demo packet completes end to end; the mesh-validation claim is rejected; the video visibly proves Google Cloud execution.
-- `SUBMISSION_PACKAGE_GATE` — Devpost draft has Taskmaster selected, text description, repo URL, architecture diagram, hosted URL if available, and a public YouTube/Vimeo video no longer than 4 minutes.
+- `GOOGLE_TECH_GATE` — live Google-hosted run must return a receipt whose `model` is `gemini-3.5-flash`; deterministic-only `model: not-run` is not sufficient.
+- `CLOUD_GATE` — prove at least one Google Cloud infrastructure service and visibly prove the backend is running on Google Cloud. Preferred proof is Cloud Run/Vertex when already-funded. Zero-spend fallback may use Cloud Shell + one free Firestore database only when the video clearly shows the Google Cloud execution and Firestore readback; do not claim Cloud Run.
+- `DEMO_GATE` — public synthetic demo packet completes end to end; the mesh-validation claim is rejected; the video visibly proves Google Cloud execution and a real Gemini-backed result.
+- `SUBMISSION_PACKAGE_GATE` — Devpost draft has Taskmaster selected, text description, repo URL, architecture diagram, hosted URL if one actually exists, and a public YouTube/Vimeo video no longer than 4 minutes.
 
-## Owner-interactive steps
+## Interactive steps
 
-These cannot be completed by repository automation:
+If an authenticated product browser is unavailable, the smallest manual UI steps are:
 
-1. Sign in to Devpost and confirm the account has joined the All Things Agentic Hackathon.
-2. Create/open the Night Clerk submission draft and accept any required official rules/entry terms.
-3. Upload the final continuous demo to **YouTube or Vimeo as publicly visible**.
-4. Paste the live URL, repository URL, video URL, and final description into Devpost.
-5. Press the final submission button before the deadline and verify the submitted entry page/confirmation.
+1. Sign in to Google Cloud/Firebase and open the no-billing project.
+2. Create exactly one free Firestore database if absent, then open Cloud Shell.
+3. Record the final Google Cloud execution and Firestore evidence.
+4. Upload the final continuous demo to YouTube or Vimeo as publicly visible.
+5. Paste the repo/video/description and any observed live URL into Devpost, then submit before the deadline.
+
+Do not add or update a payment method solely to satisfy these steps.
 
 ## Four-minute demo storyboard
 
@@ -28,39 +30,47 @@ Aim for roughly 3:00–3:30 so upload/playback variance does not threaten the 4-
 
 ### 0:00–0:25 — friction and promise
 
-- Show the Night Clerk landing page.
+- Show the Night Clerk landing page or Web Preview.
 - State the problem: research inbox notes mix literature, simulation, scenarios, and weak engineering checks; people can accidentally treat a mesh/smoke check as scientific validation.
 - One sentence value proposition: Night Clerk finishes the classification job and writes an auditable receipt instead of chatting.
 
 ### 0:25–0:55 — architecture and authority
 
 - Show the Mermaid architecture diagram in the repository.
-- Point out Cloud Run -> Gemini 3.5 Flash on Vertex AI -> deterministic gate -> Cloud Storage + Firestore.
+- Point out Gemini 3.5 Flash / Gen AI SDK -> deterministic gate -> durable Google Cloud state.
+- If the actual run uses zero-spend Firestore-only persistence, say so explicitly and do not narrate Cloud Storage as live proof.
 - State the authority boundary: Gemini proposes the evidence label; deterministic code owns accept/hold/reject.
 
 ### 0:55–1:15 — undeniable cloud proof
 
-Show at least one of these while recording:
+Preferred evidence when available:
 
-- the live `.run.app` URL in the browser address bar;
-- Cloud Run service dashboard/logs.
+- live `.run.app` URL in the browser address bar;
+- Cloud Run service dashboard/logs;
+- Vertex AI logs.
+
+Zero-spend fallback evidence:
+
+- Google Cloud Shell/Console visibly running the backend;
+- Cloud Shell Web Preview if available;
+- active Firestore project/database visible in Google Cloud/Firebase console.
 
 Do not rely only on a slide saying it is deployed.
 
 ### 1:15–2:30 — live proof of action
 
-- Press **Run public demo packet** on the live Cloud Run page.
+- Run the exact bundled synthetic public demo packet.
 - Keep the run continuous.
 - When the receipt appears, show:
   - `model: gemini-3.5-flash`;
   - at least one accepted claim;
   - the false mesh-validation sentence rejected with `smoke_or_mesh_is_not_scientific_validation`;
-  - the `gs://...` receipt URI if safe to show.
-- Briefly show the corresponding Firestore job record or Cloud Storage object to prove durable state.
+  - a Firestore-backed `storage_uri` or Cloud Storage URI only if that backend was actually used.
+- Briefly show the corresponding Firestore document or Cloud Storage object to prove durable state.
 
 ### 2:30–3:10 — reproducibility and safety
 
-- Show README setup commands, architecture diagram, and synthetic fixture.
+- Show README/setup commands, architecture diagram, and synthetic fixture.
 - Mention that local dry-run is credential-free, while cloud mode fails closed if Gemini is not configured.
 - State that the public demo uses synthetic data only.
 
@@ -74,14 +84,14 @@ Do not rely only on a slide saying it is deployed.
 - Maximum 4 minutes; only the first 4 minutes are evaluated.
 - Publicly visible on YouTube or Vimeo.
 - English, or include English subtitles.
-- Show a genuine live execution. A continuous uniform speed-up is acceptable only if it remains a real single run; add an on-screen note if sped up.
-- Do not fabricate Cloud Run, Firestore, GCS, Gemini, or submission evidence.
+- Show a genuine live execution.
+- Do not fabricate Cloud Run, Firestore, Cloud Storage, Gemini, or submission evidence.
 
 ## Final readback
 
-Before pressing Submit, verify all links from a logged-out/incognito browser where possible:
+Before pressing Submit, verify all available links from a logged-out/incognito browser where possible:
 
-- live app / `.run.app` URL;
+- live app URL if one actually exists;
 - public GitHub repository;
 - public YouTube/Vimeo video;
 - architecture diagram renders;
