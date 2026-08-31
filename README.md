@@ -4,7 +4,7 @@ Night Clerk is a job-style research-inbox agent for the **All Things Agentic Hac
 
 It does not chat. It takes a messy inbox packet, asks Gemini to classify the evidence type of each claim, applies a deterministic scientific-safety gate, and writes a receipt for human review.
 
-Built with **Gemini 3.5 Flash**, **Google Gen AI SDK**, **Google ADK**, **Cloud Run**, **Cloud Storage**, and **Firestore**.
+Implemented with **Gemini 3.5 Flash**, **Google Gen AI SDK**, **Google ADK**, **Firestore**, and two Google Cloud runtime lanes described below. The final submission must claim only the lane actually demonstrated in the public video.
 
 ## The friction
 
@@ -28,13 +28,16 @@ python -m night_clerk.cli run --packet fixtures\inbox\overvoltage-inbox.json
 
 The local path is intentionally credential-free and does not call Gemini. The bundled public fixture includes a sentence claiming that a mesh check scientifically validates a CFD result; the deterministic gate **rejects** that claim.
 
-## Cloud demo
+## Google Cloud demo paths
 
-The contest deployment path runs the FastAPI service on Cloud Run, calls **Gemini 3.5 Flash through the Google Gen AI SDK on Vertex AI**, and writes receipts to Cloud Storage plus compact job state to Firestore.
+Night Clerk contains two bounded cloud paths:
 
-After deployment, open the Cloud Run root URL and press **Run public demo packet**. The page posts a synthetic packet to `/jobs` and renders the persisted job receipt returned by the live backend.
+- **Funded/credit lane:** FastAPI on Cloud Run, Gemini 3.5 Flash through the Google Gen AI SDK on Vertex AI, with Cloud Storage + Firestore persistence.
+- **Zero-spend lane:** backend process in Google Cloud Shell, Gemini 3.5 Flash through the Gemini Developer API free tier, with Firestore-only persistence.
 
-Cloud deployment instructions: [`docs/SETUP.md`](docs/SETUP.md).
+The zero-spend lane does **not** claim that Cloud Shell is Cloud Run. The contest requires strict proof that the backend ran on Google Cloud; the final README/Devpost/video should describe only the exact runtime and persistence evidence actually observed.
+
+The public demo endpoint accepts only the bundled synthetic packet. Setup and proof instructions: [`docs/SETUP.md`](docs/SETUP.md).
 
 ## Architecture
 
@@ -42,13 +45,14 @@ See [`docs/architecture.md`](docs/architecture.md).
 
 ```mermaid
 flowchart LR
-    Inbox[Inbox packet] --> Run[Cloud Run]
-    Run --> Gemini[Gemini 3.5 Flash\nGen AI SDK / Vertex AI]
+    Inbox[Inbox packet] --> Runtime[Observed Google Cloud runtime]
+    Runtime --> Gemini[Gemini 3.5 Flash\nGoogle Gen AI SDK]
     Gemini --> Gate[Deterministic evidence gate]
-    Gate --> Receipt[Cloud Storage receipt]
-    Gate --> Firestore[Firestore job record]
-    Receipt --> Human[Human review]
+    Gate --> Firestore[Firestore receipt state]
+    Firestore --> Human[Human review]
 ```
+
+The funded/credit lane may additionally use Cloud Storage; do not claim that service unless it was actually demonstrated.
 
 ### Authority boundary
 
@@ -61,11 +65,12 @@ flowchart LR
 
 ## Contest stack mapping
 
-| Requirement | Implementation |
+| Requirement | Implementation / proof boundary |
 |---|---|
-| Gemini 3.5+ | `gemini-3.5-flash` via Google Gen AI SDK |
+| Gemini 3.5+ | `gemini-3.5-flash` via Google Gen AI SDK; final proof requires one real Gemini-backed receipt |
 | Google agent framework | Google Gen AI SDK; bounded ADK root agent is also provided in `agent.py` |
-| Google Cloud infrastructure | Cloud Run + Cloud Storage + Firestore |
+| Google Cloud infrastructure | Firestore is implemented in both cloud lanes; Cloud Run/Cloud Storage are implemented only for the funded/credit lane |
+| Google Cloud backend proof | Must be shown in the final continuous video using the exact observed runtime; Cloud Shell must not be described as Cloud Run |
 | Reproducible setup | this README + `docs/SETUP.md` |
 | Architecture diagram | README + `docs/architecture.md` |
 | Public-safe demo data | `fixtures/inbox/overvoltage-inbox.json` |
