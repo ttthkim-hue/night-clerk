@@ -1,0 +1,39 @@
+name: submission-gate
+
+on:
+  push:
+    branches:
+      - work/issue-1-night-clerk-submission
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  local-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout exact branch head
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install package and test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e '.[dev]'
+
+      - name: Full pytest
+        env:
+          NIGHT_CLERK_MODE: local
+        run: python -m pytest -q
+
+      - name: Credential-free CLI dry run
+        env:
+          NIGHT_CLERK_MODE: local
+        run: python -m night_clerk.cli run --packet fixtures/inbox/overvoltage-inbox.json
